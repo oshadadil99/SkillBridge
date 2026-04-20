@@ -65,12 +65,6 @@ function User() {
     [courses]
   );
 
-  const handleLogout = () => {
-    clearSession();
-    setUser(null);
-    setCourses([]);
-  };
-
   if (!isAuthenticated()) {
     return (
       <div className="mx-auto w-full max-w-7xl space-y-6">
@@ -98,7 +92,7 @@ function User() {
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6">
-      <div className="flex items-start justify-between rounded-2xl border border-[#d7d2c7] bg-[#fffdfa] p-6 shadow-sm">
+      <div className="rounded-2xl border border-[#d7d2c7] bg-[#fffdfa] p-6 shadow-sm">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6c7da7]">User Dashboard</p>
           <h1 className="mt-2 font-serif text-4xl font-bold tracking-tight text-[#112765]">My Purchased Courses</h1>
@@ -106,14 +100,6 @@ function User() {
             Signed in as {user?.email || "user"}.
           </p>
         </div>
-
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="inline-flex items-center justify-center rounded-xl border border-[#c8c4ba] bg-[#fffdfa] px-4 py-2 text-sm font-semibold text-[#10246d] hover:border-[#10246d]"
-        >
-          Log Out
-        </button>
       </div>
 
       {loading ? (

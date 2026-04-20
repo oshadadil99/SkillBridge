@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
+import { randomUUID } from "crypto";
 
 import CatalogCourse from "../models/CatalogCourse.js";
+import Payment from "../models/Payment.js";
 import User from "../models/User.js";
 import Course from "../models/Course.js";
 import Module from "../models/Module.js";
@@ -262,6 +264,22 @@ export const purchaseCatalogCourse = async (req, res) => {
       });
     }
 
+    const alreadyPurchased = Array.isArray(req.user?.purchasedCourses)
+      && req.user.purchasedCourses.map(String).includes(String(normalized._id));
+
+    if (alreadyPurchased) {
+      return res.json({
+        success: true,
+        message: "Course already purchased",
+        data: {
+          course: normalized,
+          purchasedCourses: Array.isArray(req.user?.purchasedCourses)
+            ? req.user.purchasedCourses
+            : []
+        }
+      });
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
       {
@@ -273,6 +291,27 @@ export const purchaseCatalogCourse = async (req, res) => {
         new: true
       }
     ).lean();
+
+    const numericPrice = toNumber(normalized.price);
+
+    if (numericPrice > 0) {
+      await Payment.create({
+        transactionId: randomUUID(),
+        userId: String(req.user?._id || ""),
+        userName: pickFirstString(
+          req.user?.name,
+          req.user?.email ? String(req.user.email).split("@")[0] : "",
+          "User"
+        ),
+        userEmail: pickFirstString(req.user?.email),
+        courseId: String(normalized._id),
+        courseName: normalized.title,
+        amount: numericPrice,
+        paymentStatus: "Success",
+        paymentMethod: pickFirstString(req.body?.paymentMethod, "Card"),
+        date: new Date()
+      });
+    }
 
     return res.json({
       success: true,

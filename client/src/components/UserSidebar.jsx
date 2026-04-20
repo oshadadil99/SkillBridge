@@ -1,5 +1,7 @@
-import { NavLink, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+
+import { clearSession, getStoredUser } from "../auth/session";
 
 const DashboardIcon = () => (
   <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -55,10 +57,40 @@ const navItems = [
 
 function UserSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const toolsInitiallyOpen = navItems
     .find((i) => i.label === "Tools")
     ?.children?.some((child) => location.pathname.startsWith(child.to)) || false;
   const [toolsOpen, setToolsOpen] = useState(toolsInitiallyOpen);
+  const [currentUser, setCurrentUser] = useState(() => getStoredUser());
+
+  useEffect(() => {
+    const handleAuthChanged = () => {
+      setCurrentUser(getStoredUser());
+    };
+
+    window.addEventListener("authChanged", handleAuthChanged);
+    return () => window.removeEventListener("authChanged", handleAuthChanged);
+  }, []);
+
+  const displayName = useMemo(() => {
+    if (currentUser?.name) {
+      return currentUser.name;
+    }
+
+    if (currentUser?.email) {
+      return currentUser.email.split("@")[0];
+    }
+
+    return currentUser?.role === "admin" ? "Admin User" : "User";
+  }, [currentUser]);
+
+  const displayEmail = currentUser?.email || "you@skillbridge.local";
+
+  const handleLogout = () => {
+    clearSession();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <div className="w-64 sticky top-0 h-screen bg-[#2A3556] text-white flex flex-col flex-shrink-0 hidden md:flex z-30">
@@ -75,8 +107,8 @@ function UserSidebar() {
             <IconUser />
           </div>
           <div className="overflow-hidden">
-            <div className="font-semibold text-sm truncate">User</div>
-            <div className="text-xs text-slate-300 truncate">you@skillbridge.local</div>
+            <div className="font-semibold text-sm truncate">{displayName}</div>
+            <div className="text-xs text-slate-300 truncate">{displayEmail}</div>
           </div>
         </div>
       </div>
@@ -154,6 +186,16 @@ function UserSidebar() {
           );
         })}
       </nav>
+
+      <div className="px-4 pb-6">
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="w-full rounded-lg border border-[#556387] bg-transparent px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-[#39456B] hover:text-white"
+        >
+          Log Out
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
+import { getStoredUser, isAuthenticated } from "../auth/session";
 import UserSidebar from "../components/UserSidebar";
 import PageHeader from "../components/admin/PageHeader";
 
@@ -12,6 +13,15 @@ const getPageTitle = (pathname) => {
 
 function UserLayout() {
   const location = useLocation();
+  const currentUser = getStoredUser();
+
+  if (!isAuthenticated()) {
+    return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
+  }
+
+  if (currentUser?.role === "admin") {
+    return <Navigate to="/admin" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-[#F4F5F7] text-[#0d2165] font-sans">

@@ -27,6 +27,7 @@ function Courses() {
   });
   const currentUser = getStoredUser();
   const currentUserLabel = currentUser?.name || currentUser?.email || "Signed In";
+  const dashboardPath = currentUser?.role === "admin" ? "/admin" : "/user";
 
   useEffect(() => {
     try {
@@ -159,7 +160,7 @@ function Courses() {
               </span>
             ) : null}
             <a
-              href={isAuthenticated() ? "/user" : "/login"}
+              href={isAuthenticated() ? dashboardPath : "/login"}
               className="rounded-lg border border-[#c8c4ba] px-4 py-1.5 text-xs font-semibold text-[#10246d] hover:border-[#10246d]"
             >
               {isAuthenticated() ? "Dashboard" : "Sign In"}

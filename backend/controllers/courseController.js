@@ -1,6 +1,8 @@
 import Course from "../models/Course.js";
 import Module from "../models/Module.js";
 import Lesson from "../models/Lesson.js";
+import User from "../models/User.js";
+import Payment from "../models/Payment.js";
 import { removeUploadedFilesFromLessons } from "../utils/fileCleanup.js";
 
 const PUBLISH_VALIDATION_MESSAGE =
@@ -158,6 +160,29 @@ export const deleteCourse = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Course not found" });
+    }
+
+    const courseId = String(course._id);
+
+    const [enrolledUser, paymentRecord] = await Promise.all([
+      User.findOne({
+        purchasedCourses: courseId
+      })
+        .select("name email")
+        .lean(),
+      Payment.findOne({
+        courseId,
+        paymentStatus: "Success"
+      })
+        .select("transactionId userEmail")
+        .lean()
+    ]);
+
+    if (enrolledUser || paymentRecord) {
+      return res.status(409).json({
+        success: false,
+        message: "This course cannot be deleted because a user has already enrolled or purchased it."
+      });
     }
 
     const modules = await Module.find({ courseId: course._id }).select("_id").lean();

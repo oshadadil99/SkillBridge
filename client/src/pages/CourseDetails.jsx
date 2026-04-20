@@ -38,6 +38,14 @@ function CourseDetails() {
   const [course, setCourse] = useState(null);
   const [modules, setModules] = useState([]);
   const [purchasing, setPurchasing] = useState(false);
+  const [paymentForm, setPaymentForm] = useState({
+    cardholderName: "",
+    cardNumber: "",
+    expiryDate: "",
+    cvv: "",
+    billingEmail: ""
+  });
+  const [paymentError, setPaymentError] = useState("");
   const [purchasedIds, setPurchasedIds] = useState(() => {
     const user = getStoredUser();
     return Array.isArray(user?.purchasedCourses) ? user.purchasedCourses.map(String) : [];
@@ -161,6 +169,15 @@ function CourseDetails() {
   const currentUserLabel = currentUser?.name || currentUser?.email || "Signed In";
   const isPurchased = purchasedIds.includes(String(id));
   const showProtectedContent = isPurchased || currentUser?.role === "admin";
+  const dashboardPath = currentUser?.role === "admin" ? "/admin" : "/user";
+  const isPaidCourse = Number(course?.price || 0) > 0;
+
+  useEffect(() => {
+    setPaymentForm((prev) => ({
+      ...prev,
+      billingEmail: currentUser?.email || prev.billingEmail
+    }));
+  }, [currentUser?.email]);
 
   const handleBuyCourse = async () => {
     if (!isAuthenticated()) {
@@ -188,6 +205,35 @@ function CourseDetails() {
     } finally {
       setPurchasing(false);
     }
+  };
+
+  const handlePaymentInputChange = (event) => {
+    const { name, value } = event.target;
+
+    setPaymentForm((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+    setPaymentError("");
+  };
+
+  const handlePaymentSubmit = async (event) => {
+    event.preventDefault();
+
+    const requiredValues = [
+      paymentForm.cardholderName,
+      paymentForm.cardNumber,
+      paymentForm.expiryDate,
+      paymentForm.cvv,
+      paymentForm.billingEmail
+    ];
+
+    if (requiredValues.some((value) => !String(value || "").trim())) {
+      setPaymentError("Complete the temporary payment form before buying this additional course.");
+      return;
+    }
+
+    await handleBuyCourse();
   };
 
   if (loading) {
@@ -247,7 +293,7 @@ function CourseDetails() {
               </span>
             ) : null}
             <a
-              href={isAuthenticated() ? "/user" : "/login"}
+              href={isAuthenticated() ? dashboardPath : "/login"}
               className="rounded-lg border border-[#c8c4ba] px-4 py-1.5 text-xs font-semibold text-[#10246d] hover:border-[#10246d]"
             >
               {isAuthenticated() ? "Dashboard" : "Sign In"}
@@ -297,12 +343,19 @@ function CourseDetails() {
                 </button>
 
                 <Link
-                  to="/user"
+                  to={dashboardPath}
                   className="ml-3 inline-flex items-center justify-center rounded-xl border border-[#c8c4ba] bg-[#fffdfa] px-3 py-2 text-sm font-semibold text-[#10246d] hover:border-[#10246d]"
                 >
                   View My Courses
                 </Link>
               </>
+            ) : isPaidCourse ? (
+              <a
+                href="#payment-section"
+                className="inline-flex items-center justify-center rounded-xl bg-[#10246d] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1d327f]"
+              >
+                Open Payment Section
+              </a>
             ) : (
               <button
                 type="button"
@@ -338,6 +391,140 @@ function CourseDetails() {
             </div>
           </div>
         </section>
+
+        {!showProtectedContent && isPaidCourse ? (
+          <section
+            id="payment-section"
+            className="rounded-2xl border border-[#d7d2c7] bg-[#fffdfa] p-6 shadow-sm md:p-8"
+          >
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6c7da7]">
+                  Temporary Payment Section
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold text-[#112765]">
+                  Payment Details
+                </h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6c7da7]">
+                  This is a temporary placeholder payment form until the full payment
+                  gateway is implemented by another developer. Users must pass through
+                  this section before buying an additional course.
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-[#eef1f7] px-4 py-3 text-sm font-semibold text-[#10246d]">
+                Amount: {formattedPrice}
+              </div>
+            </div>
+
+            <form onSubmit={handlePaymentSubmit} className="mt-6 space-y-5">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label htmlFor="cardholderName" className="text-sm font-medium text-[#1c2f6f]">
+                    Cardholder Name
+                  </label>
+                  <input
+                    id="cardholderName"
+                    name="cardholderName"
+                    type="text"
+                    value={paymentForm.cardholderName}
+                    onChange={handlePaymentInputChange}
+                    placeholder="Enter cardholder name"
+                    className="w-full rounded-xl border border-[#c8c4ba] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#10246d] focus:ring-2 focus:ring-[#10246d]/20"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="billingEmail" className="text-sm font-medium text-[#1c2f6f]">
+                    Billing Email
+                  </label>
+                  <input
+                    id="billingEmail"
+                    name="billingEmail"
+                    type="email"
+                    value={paymentForm.billingEmail}
+                    onChange={handlePaymentInputChange}
+                    placeholder="Enter billing email"
+                    className="w-full rounded-xl border border-[#c8c4ba] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#10246d] focus:ring-2 focus:ring-[#10246d]/20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-[2fr_1fr_1fr]">
+                <div className="space-y-2">
+                  <label htmlFor="cardNumber" className="text-sm font-medium text-[#1c2f6f]">
+                    Card Number
+                  </label>
+                  <input
+                    id="cardNumber"
+                    name="cardNumber"
+                    type="text"
+                    value={paymentForm.cardNumber}
+                    onChange={handlePaymentInputChange}
+                    placeholder="0000 0000 0000 0000"
+                    className="w-full rounded-xl border border-[#c8c4ba] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#10246d] focus:ring-2 focus:ring-[#10246d]/20"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="expiryDate" className="text-sm font-medium text-[#1c2f6f]">
+                    Expiry
+                  </label>
+                  <input
+                    id="expiryDate"
+                    name="expiryDate"
+                    type="text"
+                    value={paymentForm.expiryDate}
+                    onChange={handlePaymentInputChange}
+                    placeholder="MM/YY"
+                    className="w-full rounded-xl border border-[#c8c4ba] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#10246d] focus:ring-2 focus:ring-[#10246d]/20"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="cvv" className="text-sm font-medium text-[#1c2f6f]">
+                    CVV
+                  </label>
+                  <input
+                    id="cvv"
+                    name="cvv"
+                    type="password"
+                    value={paymentForm.cvv}
+                    onChange={handlePaymentInputChange}
+                    placeholder="123"
+                    className="w-full rounded-xl border border-[#c8c4ba] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#10246d] focus:ring-2 focus:ring-[#10246d]/20"
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-dashed border-[#c8c4ba] bg-[#f8f5ef] p-4 text-sm text-[#6c7da7]">
+                Payment gateway integration is not connected yet. This form is a temporary
+                UI step only and will be replaced by the dedicated payment implementation.
+              </div>
+
+              {paymentError ? (
+                <p className="text-sm font-medium text-rose-600">{paymentError}</p>
+              ) : null}
+
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="submit"
+                  disabled={purchasing}
+                  className="inline-flex items-center justify-center rounded-xl bg-[#10246d] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1d327f] disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {purchasing ? "Processing..." : "Confirm Payment & Buy Course"}
+                </button>
+
+                <Link
+                  to="/course"
+                  className="inline-flex items-center justify-center rounded-xl border border-[#c8c4ba] bg-[#fffdfa] px-5 py-2.5 text-sm font-semibold text-[#10246d] transition hover:border-[#10246d]"
+                >
+                  Back to Catalog
+                </Link>
+              </div>
+            </form>
+          </section>
+        ) : null}
 
         <section className="space-y-4 rounded-2xl border border-[#d7d2c7] bg-[#fffdfa] p-6 shadow-sm md:p-8">
           <h2 className="text-xl font-semibold text-[#112765]">Course Content</h2>
