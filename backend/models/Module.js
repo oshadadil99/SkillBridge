@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 
+import { getNamedDb } from "../config/db.js";
+
+const skillbridgeDb = getNamedDb("skillbridge");
+
 const moduleSchema = new mongoose.Schema(
   {
     title: {
@@ -23,4 +27,5 @@ const moduleSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("Module", moduleSchema);
+export default skillbridgeDb.models.Module
+  || skillbridgeDb.model("Module", moduleSchema, "modules");

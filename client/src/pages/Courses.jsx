@@ -132,36 +132,36 @@ function Courses() {
   }, [courses, searchTerm, selectedCategory, selectedType]);
 
   return (
-    <main className="min-h-screen bg-[#f6f2ea] text-[#0d2165]">
+    <main className="min-h-screen bg-[#F8F3EA] text-[#0B1957]">
       <header
-        className={`sticky top-0 z-30 border-b border-[#d8d2c5] bg-[#f6f2ea]/95 backdrop-blur transition-all duration-300 ${
+        className={`sticky top-0 z-30 border-b border-[#9ECCFA] bg-[#F8F3EA]/95 backdrop-blur transition-all duration-300 ${
           isScrolled ? "shadow-[0_6px_24px_rgba(11,25,87,0.08)]" : ""
         }`}
       >
         <nav className="mx-auto flex h-16 w-full max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-8">
           <a href="/home" className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#10246d] text-xs text-white">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#0B1957] text-xs text-[#F8F3EA]">
               âŒ‚
             </div>
             <span className="text-sm font-bold uppercase tracking-[0.2em]">SkillBridge</span>
           </a>
 
-          <div className="hidden items-center gap-9 text-xs font-semibold text-[#5e6f9a] md:flex">
-            <a href="/home" className="transition hover:text-[#10246d]">Home</a>
-            <a href="/home#about" className="transition hover:text-[#10246d]">About Us</a>
-            <a href="/course" className="text-[#10246d]">Courses</a>
-            <a href="/home#additional" className="transition hover:text-[#10246d]">Additional Courses</a>
+          <div className="hidden items-center gap-9 text-xs font-semibold text-[#0B1957]/70 md:flex">
+            <a href="/home" className="transition hover:text-[#0B1957]">Home</a>
+            <a href="/home#about" className="transition hover:text-[#0B1957]">About Us</a>
+            <a href="/course" className="text-[#0B1957]">Courses</a>
+            <a href="/home#additional" className="transition hover:text-[#0B1957]">Additional Courses</a>
           </div>
 
           <div className="flex items-center gap-2">
             {isAuthenticated() ? (
-              <span className="hidden text-sm font-medium text-[#5e6f9a] md:inline">
+              <span className="hidden text-sm font-medium text-[#0B1957]/70 md:inline">
                 {currentUserLabel}
               </span>
             ) : null}
             <a
               href={isAuthenticated() ? dashboardPath : "/login"}
-              className="rounded-lg border border-[#c8c4ba] px-4 py-1.5 text-xs font-semibold text-[#10246d] hover:border-[#10246d]"
+              className="rounded-lg border border-[#9ECCFA] px-4 py-1.5 text-xs font-semibold text-[#0B1957] hover:border-[#0B1957] hover:bg-[#D1E8FF]"
             >
               {isAuthenticated() ? "Dashboard" : "Sign In"}
             </a>
@@ -170,15 +170,15 @@ function Courses() {
       </header>
 
       <div className="mx-auto w-full max-w-[1280px] space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-        <section className="rounded-3xl border border-[#d7d2c7] bg-[#f8f5ef] p-6 shadow-sm sm:p-8">
-          <p className="inline-flex items-center gap-2 rounded-full border border-[#c9c5bb] bg-[#ece8df] px-4 py-1 text-xs font-semibold text-[#10246d]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#1f8450]" />
+        <section className="rounded-3xl border border-[#9ECCFA] bg-[#D1E8FF] p-6 shadow-sm sm:p-8">
+          <p className="inline-flex items-center gap-2 rounded-full border border-[#9ECCFA] bg-[#F8F3EA] px-4 py-1 text-xs font-semibold text-[#0B1957]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#0B1957]" />
             Course Catalog
           </p>
-          <h1 className="mt-4 font-serif text-4xl font-bold leading-tight text-[#112765] sm:text-5xl">
+          <h1 className="mt-4 font-serif text-4xl font-bold leading-tight text-[#0B1957] sm:text-5xl">
             Available Courses
           </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-[#6c7da7]">
+          <p className="mt-3 max-w-2xl text-base leading-7 text-[#0B1957]/70">
             Browse the course catalog from the payment database and buy the courses you want to access.
           </p>
 
@@ -188,13 +188,13 @@ function Courses() {
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
               placeholder="Search by title or category"
-              className="w-full rounded-xl border border-[#c8c4ba] bg-[#fffdfa] px-4 py-3 text-sm text-[#0d2165] outline-none transition focus:border-[#10246d] focus:ring-2 focus:ring-[#10246d]/20 md:col-span-4"
+              className="w-full rounded-xl border border-[#9ECCFA] bg-[#F8F3EA] px-4 py-3 text-sm text-[#0B1957] outline-none transition focus:border-[#0B1957] focus:ring-2 focus:ring-[#9ECCFA] md:col-span-4"
             />
 
             <select
               value={selectedCategory}
               onChange={(event) => setSelectedCategory(event.target.value)}
-              className="w-full rounded-xl border border-[#c8c4ba] bg-[#fffdfa] px-3 py-2 text-sm text-[#0d2165] outline-none transition focus:border-[#10246d] focus:ring-2 focus:ring-[#10246d]/20 md:col-span-1"
+              className="w-full rounded-xl border border-[#9ECCFA] bg-[#F8F3EA] px-3 py-2 text-sm text-[#0B1957] outline-none transition focus:border-[#0B1957] focus:ring-2 focus:ring-[#9ECCFA] md:col-span-1"
             >
               {categories.map((category) => (
                 <option key={category} value={category}>
@@ -206,7 +206,7 @@ function Courses() {
             <select
               value={selectedType}
               onChange={(event) => setSelectedType(event.target.value)}
-              className="w-full rounded-xl border border-[#c8c4ba] bg-[#fffdfa] px-3 py-2 text-sm text-[#0d2165] outline-none transition focus:border-[#10246d] focus:ring-2 focus:ring-[#10246d]/20 md:col-span-1"
+              className="w-full rounded-xl border border-[#9ECCFA] bg-[#F8F3EA] px-3 py-2 text-sm text-[#0B1957] outline-none transition focus:border-[#0B1957] focus:ring-2 focus:ring-[#9ECCFA] md:col-span-1"
             >
               <option value="all">All Types</option>
               <option value="Course">Course</option>
@@ -216,13 +216,13 @@ function Courses() {
         </section>
 
         {loading ? (
-          <div className="rounded-2xl border border-[#d7d2c7] bg-[#fffdfa] p-10 text-center text-sm font-medium text-[#6c7da7] shadow-sm">
+          <div className="rounded-2xl border border-[#9ECCFA] bg-[#D1E8FF] p-10 text-center text-sm font-medium text-[#0B1957]/70 shadow-sm">
             Loading available courses...
           </div>
         ) : filteredCourses.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-[#c8c4ba] bg-[#fffdfa] p-10 text-center shadow-sm">
-            <p className="text-base font-medium text-[#1c2f6f]">No courses found</p>
-            <p className="mt-1 text-sm text-[#6c7da7]">
+          <div className="rounded-2xl border border-dashed border-[#9ECCFA] bg-[#D1E8FF] p-10 text-center shadow-sm">
+            <p className="text-base font-medium text-[#0B1957]">No courses found</p>
+            <p className="mt-1 text-sm text-[#0B1957]/70">
               Try changing your search text or category filter.
             </p>
           </div>
@@ -230,7 +230,7 @@ function Courses() {
           <>
             {(selectedType === "all" || selectedType === "Course") && (
               <section>
-                <h2 className="mb-4 mt-6 text-2xl font-semibold text-[#112765]">Course</h2>
+                <h2 className="mb-4 mt-6 text-2xl font-semibold text-[#0B1957]">Course</h2>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
                   {filteredCourses
                     .filter((course) => Number(course.price || 0) === 0)
@@ -245,11 +245,11 @@ function Courses() {
               </section>
             )}
 
-            {selectedType === "all" && <div className="my-10 border-t border-[#e7e3da]" />}
+            {selectedType === "all" && <div className="my-10 border-t border-[#9ECCFA]" />}
 
             {(selectedType === "all" || selectedType === "Additional Course") && (
               <section>
-                <h2 className="mb-4 mt-6 text-2xl font-semibold text-[#112765]">Additional Course</h2>
+                <h2 className="mb-4 mt-6 text-2xl font-semibold text-[#0B1957]">Additional Course</h2>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
                   {filteredCourses
                     .filter((course) => Number(course.price || 0) > 0)

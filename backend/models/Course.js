@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 
+import { getNamedDb } from "../config/db.js";
+
+const skillbridgeDb = getNamedDb("skillbridge");
+
 const courseSchema = new mongoose.Schema({
 
   title: {
@@ -54,4 +58,5 @@ const courseSchema = new mongoose.Schema({
   timestamps: true
 });
 
-export default mongoose.model("Course", courseSchema);
+export default skillbridgeDb.models.Course
+  || skillbridgeDb.model("Course", courseSchema, "courses");
