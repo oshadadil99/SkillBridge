@@ -202,7 +202,7 @@ function CourseDetails() {
         setPurchasedIds(purchasedCourses.map(String));
       }
     } catch (error) {
-      alert(error.message || "Failed to buy this course");
+      alert(error.message || "Failed to enroll in this course");
     } finally {
       setPurchasing(false);
     }
@@ -340,7 +340,7 @@ function CourseDetails() {
                   disabled
                   className="inline-flex items-center justify-center rounded-xl bg-[#9ECCFA] px-4 py-2 text-sm font-semibold text-[#0B1957]"
                 >
-                  Purchased
+                  Enrolled
                 </button>
 
                 <Link
@@ -537,7 +537,7 @@ function CourseDetails() {
               </div>
             ) : modules.length === 0 ? (
               <div className="rounded-xl border border-dashed border-[#9ECCFA] p-4 text-sm text-[#0B1957]/70">
-                No module content has been linked to this purchased course yet.
+              No module content has been linked to this enrolled course yet.
               </div>
             ) : (
               <div className="space-y-3">

@@ -1,6 +1,7 @@
 import express from "express";
 
 import {
+  disenrollCatalogCourse,
   getCatalogCourseById,
   getCatalogCourses,
   getMyCatalogCourses,
@@ -15,6 +16,7 @@ router.get("/courses", getCatalogCourses);
 router.get("/courses/:id", getCatalogCourseById);
 router.get("/courses/:id/content", requireAuth, getPurchasedCatalogCourseContent);
 router.post("/courses/:id/purchase", requireAuth, purchaseCatalogCourse);
+router.delete("/courses/:id/enrollment", requireAuth, disenrollCatalogCourse);
 router.get("/my-courses", requireAuth, getMyCatalogCourses);
 
 export default router;

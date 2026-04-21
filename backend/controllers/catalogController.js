@@ -260,7 +260,7 @@ export const purchaseCatalogCourse = async (req, res) => {
     if (!normalized.isPublished) {
       return res.status(400).json({
         success: false,
-        message: "This course is not available for purchase"
+        message: "This course is not available for enrollment"
       });
     }
 
@@ -270,7 +270,7 @@ export const purchaseCatalogCourse = async (req, res) => {
     if (alreadyPurchased) {
       return res.json({
         success: true,
-        message: "Course already purchased",
+        message: "Course already enrolled",
         data: {
           course: normalized,
           purchasedCourses: Array.isArray(req.user?.purchasedCourses)
@@ -315,7 +315,48 @@ export const purchaseCatalogCourse = async (req, res) => {
 
     return res.json({
       success: true,
-      message: "Course purchased successfully",
+      message: "Course enrolled successfully",
+      data: {
+        course: normalized,
+        purchasedCourses: Array.isArray(updatedUser?.purchasedCourses)
+          ? updatedUser.purchasedCourses
+          : []
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+export const disenrollCatalogCourse = async (req, res) => {
+  try {
+    const normalized = await findCatalogOrInternalCourse(req.params.id);
+
+    if (!normalized) {
+      return res.status(404).json({
+        success: false,
+        message: "Catalog course not found"
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $pull: {
+          purchasedCourses: normalized._id
+        }
+      },
+      {
+        new: true
+      }
+    ).lean();
+
+    return res.json({
+      success: true,
+      message: "Course disenrolled successfully",
       data: {
         course: normalized,
         purchasedCourses: Array.isArray(updatedUser?.purchasedCourses)

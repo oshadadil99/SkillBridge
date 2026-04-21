@@ -28,14 +28,14 @@ function User() {
         ]);
 
         const currentUser = meResponse.data?.data || null;
-        const purchasedCourses = Array.isArray(coursesResponse.data?.data) ? coursesResponse.data.data : [];
+        const enrolledCourses = Array.isArray(coursesResponse.data?.data) ? coursesResponse.data.data : [];
 
         if (currentUser) {
           updateStoredUser(currentUser);
           setUser(currentUser);
         }
 
-        setCourses(purchasedCourses);
+        setCourses(enrolledCourses);
       } catch {
         clearSession();
         setUser(null);
@@ -65,12 +65,38 @@ function User() {
     [courses]
   );
 
+  const handleDisenroll = async (courseId) => {
+    const selectedCourse = courses.find((course) => String(course._id) === String(courseId));
+    const courseTitle = selectedCourse?.title || "this course";
+
+    if (!window.confirm(`Disenroll from "${courseTitle}"?`)) {
+      return;
+    }
+
+    try {
+      await api.delete(`/catalog/courses/${courseId}/enrollment`);
+      const meResponse = await api.get("/auth/me");
+      const currentUser = meResponse.data?.data || null;
+
+      if (currentUser) {
+        updateStoredUser(currentUser);
+        setUser(currentUser);
+      }
+
+      setCourses((currentCourses) =>
+        currentCourses.filter((course) => String(course._id) !== String(courseId))
+      );
+    } catch (error) {
+      alert(error.message || "Failed to disenroll from this course");
+    }
+  };
+
   if (!isAuthenticated()) {
     return (
       <div className="mx-auto w-full max-w-7xl space-y-6">
         <div className="rounded-2xl border border-dashed border-[#c8c4ba] bg-[#fffdfa] p-10 text-center shadow-sm">
           <p className="text-base font-medium text-[#1c2f6f]">You need to sign in first.</p>
-          <p className="mt-1 text-sm text-[#6c7da7]">Log in to view the courses you purchased.</p>
+          <p className="mt-1 text-sm text-[#6c7da7]">Log in to view your enrolled courses.</p>
           <div className="mt-4 flex justify-center gap-3">
             <Link
               to="/login?redirect=/user"
@@ -95,7 +121,7 @@ function User() {
       <div className="rounded-2xl border border-[#d7d2c7] bg-[#fffdfa] p-6 shadow-sm">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6c7da7]">User Dashboard</p>
-          <h1 className="mt-2 font-serif text-4xl font-bold tracking-tight text-[#112765]">My Purchased Courses</h1>
+          <h1 className="mt-2 font-serif text-4xl font-bold tracking-tight text-[#112765]">My Enrolled Courses</h1>
           <p className="mt-2 text-sm text-[#6c7da7]">
             Signed in as {user?.email || "user"}.
           </p>
@@ -104,12 +130,12 @@ function User() {
 
       {loading ? (
         <div className="rounded-2xl border border-[#d7d2c7] bg-[#fffdfa] p-10 text-center text-sm font-medium text-[#6c7da7] shadow-sm">
-          Loading your purchased courses...
+          Loading your enrolled courses...
         </div>
       ) : courses.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[#c8c4ba] bg-[#fffdfa] p-10 text-center shadow-sm">
-          <p className="text-base font-medium text-[#1c2f6f]">You have not purchased any courses yet.</p>
-          <p className="mt-1 text-sm text-[#6c7da7]">Visit the catalog to buy a course.</p>
+          <p className="text-base font-medium text-[#1c2f6f]">You are not enrolled in any courses yet.</p>
+          <p className="mt-1 text-sm text-[#6c7da7]">Visit the catalog to enroll in a course.</p>
           <div className="mt-4">
             <Link
               to="/course"
@@ -135,12 +161,12 @@ function User() {
             {freeCourses.length > 0 ? (
               <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 {freeCourses.map((course) => (
-                  <CourseCard key={course._id} course={course} isEnrolled />
+                  <CourseCard key={course._id} course={course} isEnrolled onRemove={handleDisenroll} />
                 ))}
               </section>
             ) : (
               <div className="rounded-2xl border border-dashed border-[#c8c4ba] bg-[#fffdfa] p-6 text-sm text-[#6c7da7]">
-                No free courses purchased yet.
+                No free courses enrolled yet.
               </div>
             )}
           </section>
@@ -159,12 +185,12 @@ function User() {
             {paidCourses.length > 0 ? (
               <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 {paidCourses.map((course) => (
-                  <CourseCard key={course._id} course={course} isEnrolled />
+                  <CourseCard key={course._id} course={course} isEnrolled onRemove={handleDisenroll} />
                 ))}
               </section>
             ) : (
               <div className="rounded-2xl border border-dashed border-[#c8c4ba] bg-[#fffdfa] p-6 text-sm text-[#6c7da7]">
-                No paid courses purchased yet.
+                No paid courses enrolled yet.
               </div>
             )}
           </section>

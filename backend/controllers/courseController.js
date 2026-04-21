@@ -181,7 +181,7 @@ export const deleteCourse = async (req, res) => {
     if (enrolledUser || paymentRecord) {
       return res.status(409).json({
         success: false,
-        message: "This course cannot be deleted because a user has already enrolled or purchased it."
+        message: "This course cannot be deleted because a user is already enrolled in it."
       });
     }
 

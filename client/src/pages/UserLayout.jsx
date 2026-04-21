@@ -24,7 +24,7 @@ function UserLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-[#D1E8FF] text-[#0B1957] font-sans">
+    <div className="min-h-screen bg-[#F8F3EA] text-[#0B1957] font-sans">
       <div className="flex min-h-screen w-full flex-col md:flex-row">
         <UserSidebar />
 
