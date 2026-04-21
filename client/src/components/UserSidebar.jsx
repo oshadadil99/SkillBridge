@@ -93,22 +93,22 @@ function UserSidebar() {
   };
 
   return (
-    <div className="w-64 sticky top-0 h-screen bg-[#2A3556] text-white flex flex-col flex-shrink-0 hidden md:flex z-30">
+    <div className="w-64 sticky top-0 h-screen bg-[#0B1957] text-white flex flex-col flex-shrink-0 hidden md:flex z-30">
       {/* Logo Area */}
       <div className="p-6 flex items-center gap-3">
-        <div className="w-8 h-8 bg-white text-[#2A3556] font-bold rounded flex items-center justify-center text-lg">S</div>
+        <div className="w-8 h-8 bg-[#F8F3EA] text-[#0B1957] font-bold rounded flex items-center justify-center text-lg">S</div>
         <span className="font-bold tracking-wider text-sm">SKILLBRIDGE</span>
       </div>
 
       {/* User Profile */}
       <div className="px-4 mb-6">
-        <div className="bg-[#39456B] rounded-lg p-3 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#4A5578] flex items-center justify-center flex-shrink-0">
+        <div className="bg-[#D1E8FF]/16 rounded-lg border border-[#9ECCFA]/30 p-3 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-[#9ECCFA]/25 flex items-center justify-center flex-shrink-0">
             <IconUser />
           </div>
           <div className="overflow-hidden">
             <div className="font-semibold text-sm truncate">{displayName}</div>
-            <div className="text-xs text-slate-300 truncate">{displayEmail}</div>
+            <div className="text-xs text-[#D1E8FF] truncate">{displayEmail}</div>
           </div>
         </div>
       </div>
@@ -128,7 +128,7 @@ function UserSidebar() {
                   onClick={() => setToolsOpen((s) => !s)}
                   aria-expanded={toolsOpen}
                   className={`flex items-center gap-3 ${
-                    groupActive ? "bg-[#4A5578] text-white" : "text-slate-300 hover:bg-[#39456B] hover:text-white"
+                    groupActive ? "bg-[#9ECCFA] text-[#0B1957]" : "text-[#D1E8FF] hover:bg-[#D1E8FF]/16 hover:text-white"
                   } px-3 py-2.5 rounded-lg text-sm font-medium transition-colors w-full`}
                 >
                   <Icon />
@@ -154,7 +154,7 @@ function UserSidebar() {
                           key={child.to}
                           className={({ isActive }) =>
                             `flex items-center gap-3 ${
-                              isActive ? "bg-[#4A5578] text-white" : "text-slate-300 hover:bg-[#39456B] hover:text-white"
+                              isActive ? "bg-[#9ECCFA] text-[#0B1957]" : "text-[#D1E8FF] hover:bg-[#D1E8FF]/16 hover:text-white"
                             } px-3 py-2.5 rounded-lg text-sm font-medium transition-colors`
                           }
                         >
@@ -176,7 +176,7 @@ function UserSidebar() {
               key={item.to}
               className={({ isActive }) =>
                 `flex items-center gap-3 ${
-                  isActive ? "bg-[#4A5578] text-white" : "text-slate-300 hover:bg-[#39456B] hover:text-white"
+                  isActive ? "bg-[#9ECCFA] text-[#0B1957]" : "text-[#D1E8FF] hover:bg-[#D1E8FF]/16 hover:text-white"
                 } px-3 py-2.5 rounded-lg text-sm font-medium transition-colors`
               }
             >
@@ -191,7 +191,7 @@ function UserSidebar() {
         <button
           type="button"
           onClick={handleLogout}
-          className="w-full rounded-lg border border-[#556387] bg-transparent px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-[#39456B] hover:text-white"
+          className="w-full rounded-lg border border-[#9ECCFA]/50 bg-transparent px-3 py-2 text-sm font-medium text-[#F8F3EA] transition hover:bg-[#D1E8FF]/16 hover:text-white"
         >
           Log Out
         </button>

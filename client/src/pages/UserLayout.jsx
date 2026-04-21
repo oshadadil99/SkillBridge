@@ -24,13 +24,13 @@ function UserLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F4F5F7] text-[#0d2165] font-sans">
+    <div className="min-h-screen bg-[#D1E8FF] text-[#0B1957] font-sans">
       <div className="flex min-h-screen w-full flex-col md:flex-row">
         <UserSidebar />
 
         <div className="flex-1">
           {location.pathname !== "/user" && (
-            <header className="sticky top-0 z-20 border-b border-[#d8d2c5] bg-[#F4F5F7]/95 backdrop-blur">
+            <header className="sticky top-0 z-20 border-b border-[#9ECCFA] bg-[#F8F3EA]/95 backdrop-blur">
               <PageHeader label="User Tools" title={getPageTitle(location.pathname)} />
             </header>
           )}
