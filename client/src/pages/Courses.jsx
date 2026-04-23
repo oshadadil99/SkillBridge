@@ -5,6 +5,14 @@ import api from "../api/axios";
 import { getStoredUser, isAuthenticated, updateStoredUser } from "../auth/session";
 import CourseCard from "../components/CourseCard";
 
+const CAREER_FOCUSED_CATEGORIES = [
+  "Software Engineering",
+  "Systems Engineering",
+  "Information Technology",
+  "Cyber Security",
+  "Data Science"
+];
+
 function Courses() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [courses, setCourses] = useState([]);
@@ -21,6 +29,7 @@ function Courses() {
       return "all";
     }
   });
+  const [selectedCareerCategory, setSelectedCareerCategory] = useState("");
   const [purchasedIds, setPurchasedIds] = useState(() => {
     const user = getStoredUser();
     return Array.isArray(user?.purchasedCourses) ? user.purchasedCourses.map(String) : [];
@@ -110,6 +119,15 @@ function Courses() {
     return ["all", ...Array.from(unique).sort((a, b) => a.localeCompare(b))];
   }, [courses]);
 
+  const categoryCourseCounts = useMemo(() => {
+    return CAREER_FOCUSED_CATEGORIES.reduce((accumulator, category) => {
+      accumulator[category] = courses.filter(
+        (course) => Number(course.price || 0) > 0 && String(course.category || "").trim() === category
+      ).length;
+      return accumulator;
+    }, {});
+  }, [courses]);
+
   const filteredCourses = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
@@ -131,6 +149,25 @@ function Courses() {
     });
   }, [courses, searchTerm, selectedCategory, selectedType]);
 
+  const filteredCareerCourses = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    return courses.filter((course) => {
+      if (Number(course.price || 0) <= 0 || !selectedCareerCategory) {
+        return false;
+      }
+
+      const title = String(course.title || "").toLowerCase();
+      const category = String(course.category || "").trim();
+
+      const matchesSelectedCareerCategory = category === selectedCareerCategory;
+      const matchesSearch =
+        !normalizedSearch || title.includes(normalizedSearch) || category.toLowerCase().includes(normalizedSearch);
+
+      return matchesSelectedCareerCategory && matchesSearch;
+    });
+  }, [courses, searchTerm, selectedCareerCategory]);
+
   return (
     <main className="min-h-screen bg-[#F8F3EA] text-[#0B1957]">
       <header
@@ -141,7 +178,7 @@ function Courses() {
         <nav className="mx-auto flex h-16 w-full max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-8">
           <a href="/home" className="flex items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#0B1957] text-xs text-[#F8F3EA]">
-              âŒ‚
+              S
             </div>
             <span className="text-sm font-bold uppercase tracking-[0.2em]">SkillBridge</span>
           </a>
@@ -248,19 +285,112 @@ function Courses() {
             {selectedType === "all" && <div className="my-10 border-t border-[#9ECCFA]" />}
 
             {(selectedType === "all" || selectedType === "Additional Course") && (
-              <section>
-                <h2 className="mb-4 mt-6 text-2xl font-semibold text-[#0B1957]">Additional Course</h2>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-                  {filteredCourses
-                    .filter((course) => Number(course.price || 0) > 0)
-                    .map((course) => (
-                      <CourseCard
-                        key={course._id}
-                        course={course}
-                        isEnrolled={purchasedIds.includes(String(course._id))}
-                      />
-                    ))}
+              <section className="space-y-6">
+                <div className="flex flex-col gap-2">
+                  <h2 className="mt-6 text-2xl font-semibold text-[#0B1957]">Career Focused Courses</h2>
+                  <p className="max-w-3xl text-sm leading-6 text-[#0B1957]/70">
+                    Choose a career pathway to explore the additional courses available for that specialization.
+                  </p>
                 </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+                  {CAREER_FOCUSED_CATEGORIES.map((category) => {
+                    const isActive = selectedCareerCategory === category;
+                    const courseCount = categoryCourseCounts[category] || 0;
+
+                    return (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() =>
+                          setSelectedCareerCategory((currentCategory) =>
+                            currentCategory === category ? "" : category
+                          )
+                        }
+                        className={`group rounded-3xl border p-5 text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(11,25,87,0.12)] ${
+                          isActive
+                            ? "border-[#0B1957] bg-[#0B1957] text-[#F8F3EA]"
+                            : "border-[#9ECCFA] bg-[#D1E8FF] text-[#0B1957] hover:border-[#0B1957]"
+                        }`}
+                      >
+                        <div
+                          className={`mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl border text-sm font-bold ${
+                            isActive
+                              ? "border-[#9ECCFA] bg-[#9ECCFA] text-[#0B1957]"
+                              : "border-[#9ECCFA] bg-[#F8F3EA] text-[#0B1957]"
+                          }`}
+                        >
+                          {category
+                            .split(" ")
+                            .map((word) => word[0])
+                            .join("")
+                            .slice(0, 2)}
+                        </div>
+                        <h3 className="text-lg font-bold leading-6">{category}</h3>
+                        <p className={`mt-3 text-sm ${isActive ? "text-[#D1E8FF]" : "text-[#0B1957]/70"}`}>
+                          {courseCount} additional course{courseCount === 1 ? "" : "s"} available
+                        </p>
+                        <span
+                          className={`mt-6 inline-flex text-xs font-semibold uppercase tracking-[0.2em] ${
+                            isActive ? "text-[#9ECCFA]" : "text-[#0B1957]/60"
+                          }`}
+                        >
+                          {isActive ? "Selected" : "View Courses"}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {selectedCareerCategory ? (
+                  filteredCareerCourses.length > 0 ? (
+                    <div className="space-y-4">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                          <h3 className="text-xl font-semibold text-[#0B1957]">{selectedCareerCategory}</h3>
+                          <p className="text-sm text-[#0B1957]/70">
+                            Additional courses available in this focus area.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedCareerCategory("")}
+                          className="inline-flex items-center justify-center rounded-xl border border-[#9ECCFA] bg-[#F8F3EA] px-4 py-2 text-sm font-semibold text-[#0B1957] transition hover:border-[#0B1957] hover:bg-[#D1E8FF]"
+                        >
+                          Clear Selection
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+                        {filteredCareerCourses.map((course) => (
+                          <CourseCard
+                            key={course._id}
+                            course={course}
+                            isEnrolled={purchasedIds.includes(String(course._id))}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl border border-dashed border-[#9ECCFA] bg-[#D1E8FF] p-8 text-center shadow-sm">
+                      <p className="text-base font-medium text-[#0B1957]">
+                        No additional courses found for {selectedCareerCategory}.
+                      </p>
+                      <p className="mt-1 text-sm text-[#0B1957]/70">
+                        Try another focus area or adjust your search text.
+                      </p>
+                    </div>
+                  )
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-[#9ECCFA] bg-[#D1E8FF] p-8 text-center shadow-sm">
+                    <p className="text-base font-medium text-[#0B1957]">
+                      Select a career focus area to view related additional courses.
+                    </p>
+                    <p className="mt-1 text-sm text-[#0B1957]/70">
+                      The course list will appear here after you choose one of the five categories.
+                    </p>
+                  </div>
+                )}
               </section>
             )}
           </>
